@@ -1,12 +1,18 @@
+
+
+library(tidyverse)
+library(ggmap)
+library(dplyr)
+library(lubridate)
+library(sf)
+library(mapview)
+library(ggmap)
+
 library(readr)
 data <- read_csv("C:/Users/tkmor/Downloads/Knoxville_Scooter_Data/VEoRide_DataFormat_3.csv")
-#View(data)
+View(data)
 
-  library(dplyr)
-  library(lubridate)
 
-  install.packages("lubridate")
-library(lubridate)
 
 
 
@@ -74,13 +80,6 @@ geom_bar(fill = "#0073C2FF", stat = "identity") +
 geom_text(aes(label = counts), vjust = -0.3)
 
 
-install.packages('tidyverse')
-install.packages('ggmap')
-
-library(tidyverse)
-library(ggmap)
-
-
 # Google maps api key
 # AIzaSyDRZspAh7q9Ixy-xJ6eznnJwkLhFqRbMGc
 
@@ -116,32 +115,30 @@ for(row in 1:nrow(averages)) {
     lat <- averages[row, 3];
 
     x = geocode(paste(lon, ",", lat), "all")
-    if(names(x$results)) {
+    if(length(x$results) >= 4) {
       addr <- x$results[[4]]$formatted_address
   
       region_count <- src_plot[row,2]
       print(paste(region, region_count, addr))
-      averages$address <- addr
+      averages[row,4] <- addr
     }
   }
 
 
 
+# locs <- st_as_sf(data, coords = c("start_lon", "start_lat"), crs = 4326)
+# mapview(locs)
 
+map_data <- inner_join(averages, src_plot, by = c("src" = "src"))
 
+high_use <-  map_data %>% filter(counts > 1000)
+medium_use <- map_data %>% filter(counts < 1000 )
 
+map <- get_googlemap("Knoxville, TN", zoom = 14)
+ggmap(map) +
+  geom_point(data = high_use,
+             aes(x = start_lon, y = start_lat), color = "red") +  
+  geom_point(data = medium_use,
+             aes(x = start_lon, y = start_lat), color = "yellow")
 
-
-
-
-
-
-# By day of week
-x <- data1  %>%
-group_by(weekday) %>%
-summarise(counts = , n())
-
-
-  ggplot(x, aes(x = weekday, y = counts)) + 
-  geom_bar(fill = "#0073C2FF", stat = "identity") +
-  geom_text(aes(label = counts), vjust = -0.3)
+  

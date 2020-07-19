@@ -2,16 +2,22 @@
 library(shiny)
 library(shinythemes)
 
+
+
+
+
+
+
 ####################################
 # User Interface                   #
 ####################################
 ui <- fluidPage(theme = shinytheme("united"),
                 tags$head(
                     tags$style(HTML("
+                        body{
+                            background-color: #EEE;
+                        }
                         @media(max-width: 1020px){
-                            body{
-                            background-color: lightgrey;
-                            }
                             .reverseWrap{
                                 display:flex;
                                 flex-wrap: wrap-reverse;
@@ -23,7 +29,6 @@ ui <- fluidPage(theme = shinytheme("united"),
                         }
                     "))
                 ),
-
                 
                 
                 navbarPage("Knoxville Micro Mobility:",
@@ -39,7 +44,7 @@ ui <- fluidPage(theme = shinytheme("united"),
                                             selectInput("xvar",
                                                         "Select the x variable:",
                                                         # VVV TODO REPLACE VVV
-                                                        choices = c("A", "B", "C", "D")),
+                                                        choices = c("A", "B", "C", "D"),
                                             selectInput("yvar",
                                                         "Select the y variable:",
                                                         # VVV TODO REPLACE VVV
@@ -47,12 +52,17 @@ ui <- fluidPage(theme = shinytheme("united"),
                                             selectInput("fillcount",
                                                         "Select if wish to fill the scatter plot by county",
                                                         choices = c("Yes","No"),
-                                                        selected = "No")
+                                                        selected = "No"),
                                         ),
+                                        sliderInput("inputSlider", 
+                                                    label = "Relevant Number", 
+                                                    value = 175, 
+                                                    min = 40, 
+                                                    max = 250),
                                             
-                                            actionButton("submitbutton", 
-                                                         "Submit", 
-                                                         class = "btn btn-primary")
+                                        actionButton("submitbutton", 
+                                                    "Submit", 
+                                                    class = "btn btn-primary"),
                                         ),
                                         
                                         mainPanel(
@@ -63,15 +73,11 @@ ui <- fluidPage(theme = shinytheme("united"),
                                     ) # /div wrapper
                                     
                            ), #tabPanel(), Peak Times
-                           
-                           tabPanel("About", 
-                                    titlePanel("About"), 
-                                    div(includeMarkdown("about.md"), 
-                                        align="justify")
-                           ), #tabPanel(), About
-                           tabPanel("Navbar 2", 
-                                    "This panel is intentionally left blank"
-                            )
+                           tabPanel("Cluster Map", 
+                                    # VVV TODO VVV
+                                    "Put graph here"
+                            ),
+                           )
                 ) # navbarPage()
 ) # fluidPage()
 
