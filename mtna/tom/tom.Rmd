@@ -1,0 +1,147 @@
+library(readr)
+data <- read_csv("C:/Users/tkmor/Downloads/Knoxville_Scooter_Data/VEoRide_DataFormat_3.csv")
+#View(data)
+
+  library(dplyr)
+  library(lubridate)
+
+  install.packages("lubridate")
+library(lubridate)
+
+
+
+# Plot by hour of day
+hour_plot = data  %>%
+group_by(
+"Time" = hour(hms(Time) + hms("00:30:00") )) %>%
+summarise(counts = n())
+
+
+ggplot(hour_plot, aes(x = Time, y = counts)) + 
+geom_bar(fill = "#0073C2FF", stat = "identity") +
+geom_text(aes(label = counts), vjust = -0.3)
+
+
+
+
+# Plot by hour of day combined with day of week
+#hour_plot = data  %>%
+#group_by(
+#"Time" = paste(hour(hms(Time) + hms("00:30:00") ), weekdays(as.Date(data$Date, format='%m/%d/%Y')))) %>%
+#summarise(counts = n())
+
+
+#ggplot(hour_plot, aes(x = Time, y = counts)) + 
+#geom_bar(fill = "#0073C2FF", stat = "identity") +
+#geom_text(aes(label = counts), vjust = -0.3)
+
+
+
+  
+# Plot by day of week
+day_plot = data  %>%
+group_by(
+"Day" = weekdays(as.Date(data$Date, format='%m/%d/%Y'))) %>%
+summarise(counts = n())
+
+
+ggplot(day_plot, aes(x = Day, y = counts)) + 
+geom_bar(fill = "#0073C2FF", stat = "identity") +
+geom_text(aes(label = counts), vjust = -0.3)
+
+
+
+# k-means clustering
+cluster <- kmeans(data[,c(4,6)],20)
+data$src <- as.factor(cluster$cluster)
+
+cluster <- kmeans(data[,c(5,7)],20)
+data$dest <- as.factor(cluster$cluster)
+
+src_plot = data  %>%
+group_by(
+src) %>%
+summarise(counts = n())
+
+dest_plot = data  %>%
+group_by(
+dest) %>%
+summarise(counts = n())
+
+
+ggplot(src_plot, aes(x = src, y = counts)) + 
+geom_bar(fill = "#0073C2FF", stat = "identity") +
+geom_text(aes(label = counts), vjust = -0.3)
+
+
+install.packages('tidyverse')
+install.packages('ggmap')
+
+library(tidyverse)
+library(ggmap)
+
+
+# Google maps api key
+# AIzaSyDRZspAh7q9Ixy-xJ6eznnJwkLhFqRbMGc
+
+register_google('AIzaSyDRZspAh7q9Ixy-xJ6eznnJwkLhFqRbMGc')
+
+
+cluster <- kmeans(data[,c(4,6)],20)
+data$src <- as.factor(cluster$cluster)
+
+cluster <- kmeans(data[,c(5,7)],20)
+data$dest <- as.factor(cluster$cluster)
+
+src_plot = data  %>%
+group_by(
+src) %>%
+summarise(counts = n())
+
+dest_plot = data  %>%
+group_by(
+dest) %>%
+summarise(counts = n())
+
+
+
+averages = data  %>%
+    group_by(
+        src) %>% summarize(start_lat = mean(start_lat), start_lon = mean(start_lon))
+
+
+for(row in 1:nrow(averages)) {
+    region <- averages[row, 1];
+    lon <- averages[row, 2];
+    lat <- averages[row, 3];
+
+    x = geocode(paste(lon, ",", lat), "all")
+    if(names(x$results)) {
+      addr <- x$results[[4]]$formatted_address
+  
+      region_count <- src_plot[row,2]
+      print(paste(region, region_count, addr))
+      averages$address <- addr
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+# By day of week
+x <- data1  %>%
+group_by(weekday) %>%
+summarise(counts = , n())
+
+
+  ggplot(x, aes(x = weekday, y = counts)) + 
+  geom_bar(fill = "#0073C2FF", stat = "identity") +
+  geom_text(aes(label = counts), vjust = -0.3)
